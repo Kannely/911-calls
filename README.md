@@ -160,6 +160,8 @@ Pour vous aider, vous pouvez jeter un oeil à [$near](https://docs.mongodb.com/m
 ``
 db.calls.createIndex({point:"2dsphere"});
 ``
+
+
 ``
 db.calls.find(
    {
