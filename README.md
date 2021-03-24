@@ -78,28 +78,28 @@ Le résultat attendu est :
 
 #### Commande mongo
 ```
-db.calls.aggregate( [
-  {
+db.calls.aggregate([{
     $group: {
-       _id: "$category",
-       count: { $sum: 1 }
+        _id: "$category",
+        count: {
+            $sum: 1
+        }
     }
-  }
-] )
+}])
 ```
 
 #### Commande ElasticSearch
 ```
 POST /911-calls/_search
 {
-    "size": 0,
-    "aggs" : {
-        "categories" : {
-            "terms": {
-                "field": "category.keyword"
-            }
-        }
-    }
+   "size":0,
+   "aggs":{
+      "categories":{
+         "terms":{
+            "field":"category.keyword"
+         }
+      }
+   }
 }
 ```
 
@@ -114,42 +114,58 @@ Le résultat attendu est :
 
 #### Commande mongo
 ```
-db.calls.aggregate( [
-  {
-    $group: {
-       _id : {
-		   month: { $month: "$time_stamp" },
-		   year: { $year: "$time_stamp" }
-		   },
-       count: { $sum: 1 }
+db.calls.aggregate([{
+        $group: {
+            _id: {
+                month: {
+                    $month: "$time_stamp"
+                },
+                year: {
+                    $year: "$time_stamp"
+                }
+            },
+            count: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $sort: {
+            "count": -1
+        }
+    },
+    {
+        $limit: 3
     }
-  },
-  { $sort : {"count": -1}},
-  { $limit : 3}
-] )
+])
 ```
 
 #### Commande ElasticSearch
 ```
 POST /911-calls/_search
 {
-    "size": 0,
-    "aggs" : {
-      "by_month" : {
-        "date_histogram": {
-          "field": "time_stamp",
-          "calendar_interval": "month",
-          "order": {"_count": "desc"}  
-        },"aggs": {
-              "top3": {
-                  "bucket_sort": {
-                      "sort": [],
-                      "size": 3
-                  }
-              }
-          }
+   "size":0,
+   "aggs":{
+      "by_month":{
+         "date_histogram":{
+            "field":"time_stamp",
+            "calendar_interval":"month",
+            "order":{
+               "_count":"desc"
+            }
+         },
+         "aggs":{
+            "top3":{
+               "bucket_sort":{
+                  "sort":[
+                     
+                  ],
+                  "size":3
+               }
+            }
+         }
       }
-    }
+   }
 }
 ```
 
@@ -163,44 +179,57 @@ Le résultat attendu est :
 
 #### Commande mongo
 ```
-db.calls.aggregate( [
-  {
-	$match: {title : /overdose/i} 
-  },
-  {
-    $group: {
-       _id : "$twp",
-       count: { $sum: 1 }
+db.calls.aggregate([{
+        $match: {
+            title: /overdose/i
+        }
+    },
+    {
+        $group: {
+            _id: "$twp",
+            count: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $sort: {
+            "count": -1
+        }
+    },
+    {
+        $limit: 3
     }
-  },
-  { $sort : {"count": -1}},
-  { $limit : 3}
-] )
+])
 ```
 
 #### Commande ElasticSearch
 ```
 POST /911-calls/_search
 {
-  "size": 0,
-  "query": {
-    "match": {
-      "title": "overdose"
-    }
-  }, "aggs" : {
-    "by_cities" : {
-        "terms": {
-            "field": "twp.keyword"
-        },"aggs": {
-              "top3": {
-                  "bucket_sort": {
-                      "sort": [],
-                      "size": 3
-                  }
-              }
-          }
-    }
-  }
+   "size":0,
+   "query":{
+      "match":{
+         "title":"overdose"
+      }
+   },
+   "aggs":{
+      "by_cities":{
+         "terms":{
+            "field":"twp.keyword"
+         },
+         "aggs":{
+            "top3":{
+               "bucket_sort":{
+                  "sort":[
+                     
+                  ],
+                  "size":3
+               }
+            }
+         }
+      }
+   }
 }
 ```
 
@@ -217,35 +246,39 @@ Pour vous aider, vous pouvez jeter un oeil à [$near](https://docs.mongodb.com/m
 
 #### Commande mongo
 ```
-db.calls.createIndex({point:"2dsphere"});
+db.calls.createIndex({
+    point: "2dsphere"
+});
 ```
 
 
 ```
-db.calls.find(
-   {
-     point:
-       { $near :
-          {
-            $geometry: { type: "Point",  coordinates: [ -75.283783, 40.241493 ] },
+db.calls.find({
+    point: {
+        $near: {
+            $geometry: {
+                type: "Point",
+                coordinates: [-75.283783, 40.241493]
+            },
             $minDistance: 0,
             $maxDistance: 500
-          }
-       }
-   }
-).count()
+        }
+    }
+}).count()
 ```
 
 #### Commande ElasticSearch
 ```
 POST /911-calls/_count
 {
-  "query": {
-        "geo_distance": {
-          "distance": "500m",
-          "point": [-75.283783, 40.241493]
-        
-      }    
-  }
+   "query":{
+      "geo_distance":{
+         "distance":"500m",
+         "point":[
+            -75.283783,
+            40.241493
+         ]
+      }
+   }
 }
 ```
