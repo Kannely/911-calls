@@ -237,7 +237,7 @@ db.calls.find(
 ``
 
 #### Commande ElasticSearch
-``
+```
 POST /911-calls/_count
 {
   "query": {
@@ -248,4 +248,4 @@ POST /911-calls/_count
       }    
   }
 }
-``
+```
