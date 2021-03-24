@@ -76,6 +76,20 @@ Le résultat attendu est :
 | ----- | ----- | ------- |
 | 75589 | 23056 | 54549   |
 
+#### Commande mongo
+``
+db.calls.aggregate( [
+  {
+    $group: {
+       _id: "$category",
+       count: { $sum: 1 }
+    }
+  }
+] )
+``
+
+#### Commande ElasticSearch
+
 
 ### Trouver les 3 mois ayant comptabilisés le plus d'appels
 
