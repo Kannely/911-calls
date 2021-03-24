@@ -137,5 +137,9 @@ Réalisez le diagramme suivant :
 Envoyer la réponse sous la forme de la requête Timelion ci-dessous:  
 
 ```
-TODO : ajouter la requête Timelion ici
+.static(6500, label='Objective').lines(fill=1),
+.es(q=category:Fire, index=911-calls, timefield=time_stamp,).label("Last 6 months of Fire calls").cusum(0),
+.es(q=category:Fire, offset=-6M, index=911-calls, timefield=time_stamp,).label("Previous 6 months of Fire calls").cusum(0)
 ```
+
+![](images/my_timelion.png)
