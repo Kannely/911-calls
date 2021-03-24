@@ -77,7 +77,7 @@ Le résultat attendu est :
 | 75589 | 23056 | 54549   |
 
 #### Commande mongo
-``
+```
 db.calls.aggregate( [
   {
     $group: {
@@ -86,10 +86,10 @@ db.calls.aggregate( [
     }
   }
 ] )
-``
+```
 
 #### Commande ElasticSearch
-``
+```
 POST /911-calls/_search
 {
     "size": 0,
@@ -101,7 +101,7 @@ POST /911-calls/_search
         }
     }
 }
-``
+```
 
 
 ### Trouver les 3 mois ayant comptabilisés le plus d'appels
@@ -113,7 +113,7 @@ Le résultat attendu est :
 | 13096   | 12502   | 12162   |
 
 #### Commande mongo
-``
+```
 db.calls.aggregate( [
   {
     $group: {
@@ -127,10 +127,10 @@ db.calls.aggregate( [
   { $sort : {"count": -1}},
   { $limit : 3}
 ] )
-``
+```
 
 #### Commande ElasticSearch
-``
+```
 POST /911-calls/_search
 {
     "size": 0,
@@ -151,7 +151,7 @@ POST /911-calls/_search
       }
     }
 }
-``
+```
 
 ### Trouver le top 3 des villes avec le plus d'appels pour overdose
 
@@ -162,7 +162,7 @@ Le résultat attendu est :
 | 203       | 180        | 110            |
 
 #### Commande mongo
-``
+```
 db.calls.aggregate( [
   {
 	$match: {title : /overdose/i} 
@@ -176,10 +176,10 @@ db.calls.aggregate( [
   { $sort : {"count": -1}},
   { $limit : 3}
 ] )
-``
+```
 
 #### Commande ElasticSearch
-``
+```
 POST /911-calls/_search
 {
   "size": 0,
@@ -202,7 +202,7 @@ POST /911-calls/_search
     }
   }
 }
-``
+```
 
 ### Compter le nombre d'appels autour de Lansdale dans un rayon de 500 mètres
 
@@ -216,12 +216,12 @@ Le résultat attendu est **717**.
 Pour vous aider, vous pouvez jeter un oeil à [$near](https://docs.mongodb.com/manual/reference/operator/query/near/index.html) et [geo_distance](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-distance-query.html)
 
 #### Commande mongo
-``
+```
 db.calls.createIndex({point:"2dsphere"});
-``
+```
 
 
-``
+```
 db.calls.find(
    {
      point:
@@ -234,7 +234,7 @@ db.calls.find(
        }
    }
 ).count()
-``
+```
 
 #### Commande ElasticSearch
 ```
