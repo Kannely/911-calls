@@ -99,6 +99,24 @@ Le résultat attendu est :
 | ------- | ------- | ------- |
 | 13096   | 12502   | 12162   |
 
+#### Commande mongo
+``
+db.calls.aggregate( [
+  {
+    $group: {
+       _id : {
+		   month: { $month: "$time_stamp" },
+		   year: { $year: "$time_stamp" }
+		   },
+       count: { $sum: 1 }
+    }
+  },
+  { $sort : {"count": -1}},
+  { $limit : 3}
+] )
+``
+
+#### Commande ElasticSearch
 
 ### Trouver le top 3 des villes avec le plus d'appels pour overdose
 
@@ -108,6 +126,24 @@ Le résultat attendu est :
 | --------- | ---------- | -------------- |
 | 203       | 180        | 110            |
 
+#### Commande mongo
+``
+db.calls.aggregate( [
+  {
+	$match: {title : /overdose/i} 
+  },
+  {
+    $group: {
+       _id : "$twp",
+       count: { $sum: 1 }
+    }
+  },
+  { $sort : {"count": -1}},
+  { $limit : 3}
+] )
+``
+
+#### Commande ElasticSearch
 
 ### Compter le nombre d'appels autour de Lansdale dans un rayon de 500 mètres
 
@@ -119,3 +155,24 @@ Coordonnées GPS du quartier de *Lansdale, PA, USA* :
 Le résultat attendu est **717**.
 
 Pour vous aider, vous pouvez jeter un oeil à [$near](https://docs.mongodb.com/manual/reference/operator/query/near/index.html) et [geo_distance](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-distance-query.html)
+
+#### Commande mongo
+``
+db.calls.createIndex({point:"2dsphere"});
+``
+``
+db.calls.find(
+   {
+     point:
+       { $near :
+          {
+            $geometry: { type: "Point",  coordinates: [ -75.283783, 40.241493 ] },
+            $minDistance: 0,
+            $maxDistance: 500
+          }
+       }
+   }
+).count()
+``
+
+#### Commande ElasticSearch

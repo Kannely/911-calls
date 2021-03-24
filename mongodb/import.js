@@ -22,13 +22,12 @@ const insertCalls = async function (db, callback) {
 
       const call = {
                 "imdb_id": data.imdb_id,
-                "lat": data.lat,
-                "lng": data.lng,
+				"point": [parseFloat(data.lng), parseFloat(data.lat)],
                 "desc": data.desc,
                 "zip": data.zip,
                 "title": data.title,
 				"category": data.title.match(/^(.*):/)[1],
-                "time_stamp": data.timeStamp,
+                "time_stamp": new Date(data.timeStamp),
                 "twp": data.twp,
                 "addr": data.addr 
       }; // TODO créer l'objet call à partir de la ligne
