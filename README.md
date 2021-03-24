@@ -76,33 +76,6 @@ Le résultat attendu est :
 | ----- | ----- | ------- |
 | 75589 | 23056 | 54549   |
 
-#### Commande mongo
-```
-db.calls.aggregate([{
-    $group: {
-        _id: "$category",
-        count: {
-            $sum: 1
-        }
-    }
-}])
-```
-
-#### Commande ElasticSearch
-```
-POST /911-calls/_search
-{
-   "size":0,
-   "aggs":{
-      "categories":{
-         "terms":{
-            "field":"category.keyword"
-         }
-      }
-   }
-}
-```
-
 
 ### Trouver les 3 mois ayant comptabilisés le plus d'appels
 
@@ -112,62 +85,6 @@ Le résultat attendu est :
 | ------- | ------- | ------- |
 | 13096   | 12502   | 12162   |
 
-#### Commande mongo
-```
-db.calls.aggregate([{
-        $group: {
-            _id: {
-                month: {
-                    $month: "$time_stamp"
-                },
-                year: {
-                    $year: "$time_stamp"
-                }
-            },
-            count: {
-                $sum: 1
-            }
-        }
-    },
-    {
-        $sort: {
-            "count": -1
-        }
-    },
-    {
-        $limit: 3
-    }
-])
-```
-
-#### Commande ElasticSearch
-```
-POST /911-calls/_search
-{
-   "size":0,
-   "aggs":{
-      "by_month":{
-         "date_histogram":{
-            "field":"time_stamp",
-            "calendar_interval":"month",
-            "order":{
-               "_count":"desc"
-            }
-         },
-         "aggs":{
-            "top3":{
-               "bucket_sort":{
-                  "sort":[
-                     
-                  ],
-                  "size":3
-               }
-            }
-         }
-      }
-   }
-}
-```
 
 ### Trouver le top 3 des villes avec le plus d'appels pour overdose
 
@@ -177,61 +94,6 @@ Le résultat attendu est :
 | --------- | ---------- | -------------- |
 | 203       | 180        | 110            |
 
-#### Commande mongo
-```
-db.calls.aggregate([{
-        $match: {
-            title: /overdose/i
-        }
-    },
-    {
-        $group: {
-            _id: "$twp",
-            count: {
-                $sum: 1
-            }
-        }
-    },
-    {
-        $sort: {
-            "count": -1
-        }
-    },
-    {
-        $limit: 3
-    }
-])
-```
-
-#### Commande ElasticSearch
-```
-POST /911-calls/_search
-{
-   "size":0,
-   "query":{
-      "match":{
-         "title":"overdose"
-      }
-   },
-   "aggs":{
-      "by_cities":{
-         "terms":{
-            "field":"twp.keyword"
-         },
-         "aggs":{
-            "top3":{
-               "bucket_sort":{
-                  "sort":[
-                     
-                  ],
-                  "size":3
-               }
-            }
-         }
-      }
-   }
-}
-```
 
 ### Compter le nombre d'appels autour de Lansdale dans un rayon de 500 mètres
 
@@ -243,42 +105,3 @@ Coordonnées GPS du quartier de *Lansdale, PA, USA* :
 Le résultat attendu est **717**.
 
 Pour vous aider, vous pouvez jeter un oeil à [$near](https://docs.mongodb.com/manual/reference/operator/query/near/index.html) et [geo_distance](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-distance-query.html)
-
-#### Commande mongo
-```
-db.calls.createIndex({
-    point: "2dsphere"
-});
-```
-
-
-```
-db.calls.find({
-    point: {
-        $near: {
-            $geometry: {
-                type: "Point",
-                coordinates: [-75.283783, 40.241493]
-            },
-            $minDistance: 0,
-            $maxDistance: 500
-        }
-    }
-}).count()
-```
-
-#### Commande ElasticSearch
-```
-POST /911-calls/_count
-{
-   "query":{
-      "geo_distance":{
-         "distance":"500m",
-         "point":[
-            -75.283783,
-            40.241493
-         ]
-      }
-   }
-}
-```
